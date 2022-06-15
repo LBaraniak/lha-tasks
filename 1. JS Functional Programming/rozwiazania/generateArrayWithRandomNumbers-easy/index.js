@@ -15,12 +15,12 @@ function generateArrayOfArrays(howManyArrays = 10, howManyNumbers = 10, min = 1,
   const output = [];
   let i = 0;
 
-  do {
+  while (i++ < howManyArrays) {
     output.push(generateArrayWithRandomNumbers(howManyNumbers, min, max));
-  } while (++i < howManyArrays)
+  }
 
   return output
 }
 
 console.log(generateArrayWithRandomNumbers(30, 100, 101))
-console.log(generateArrayOfArrays(4,2,100,1000))
+console.log(generateArrayOfArrays(0,2,100,1000))
