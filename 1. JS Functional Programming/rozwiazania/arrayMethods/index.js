@@ -115,24 +115,44 @@ const filterFn = (array, callback) => {
 
 
 // reduce
-const reduceFn = (array, callback, inital = 0) => {
-  Validator.isArray(array)
-  Validator.isFunction(callback)
+// const reduceFn = (array, callback, inital = 0) => {
+//   Validator.isArray(array)
+//   Validator.isFunction(callback)
+//
+//   const lengthOfArray = array.length
+//
+//   let value = inital;
+//   for(let i = 0; i < lengthOfArray; i++) {
+//     value = callback(value, array[i]);
+//   }
+//
+//   return value
+// };
 
-  const lengthOfArray = array.length
+[1,3,undefined]
 
-  let value = inital;
-  for(let i = 0; i < lengthOfArray; i++) {
-    value = callback(value, array[i]);
+const reduceFn = (array, callback, initial) => {
+  Validator.isArray(array);
+  Validator.isFunction(callback);
+
+  const lengthOfArray = array.length;
+  const arrayCopy = array;
+  let value = !!initial ? initial : arrayCopy[0];
+  let i = !!initial ? 0 : 1;
+
+  for (i; i < lengthOfArray; i++) {
+    if(arrayCopy[i] === undefined) break;
+
+    value = callback(value, arrayCopy[i]);
   }
 
   return value
 };
-//
-// const arrayReduceFNTest = reduceFn(testArray, reduceCallback, 5)
-// console.log(arrayReduceFNTest)
-// const arrayReduce = testArray.reduce(reduceCallback, 5);
-// console.log(arrayReduce)
+
+const arrayReduceFNTest = reduceFn(testArray, reduceCallback)
+console.log(arrayReduceFNTest)
+const arrayReduce = testArray.reduce(reduceCallback);
+console.log(arrayReduce)
 
 
 const everyFn = (array, callback) => {
@@ -166,8 +186,8 @@ const someFn = (array, callback) => {
   return result
 };
 
-console.log(someFn(testArrayEvery, someCallback))
-console.log(testArrayEvery.some(someCallback))
+// console.log(someFn(testArrayEvery, someCallback))
+// console.log(testArrayEvery.some(someCallback))
 
 
 

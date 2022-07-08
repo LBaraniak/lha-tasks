@@ -131,62 +131,51 @@ const data = [
 // - a powyżej 2 ma filtrować po każdej wartości typu string lub number w obiekcie
 
 class Validator {
+
+  static validateData(arr, phrase) {
+    if(phrase.toString().length < 2) throw new Error('szukana fraza jest za krótka');
+    if(!this.validateNumber(phrase) && !this.validateString(phrase)) throw new Error('szukana fraza nie jest ani stringiem ani liczba');
+    if(!this.validateArray(arr) || arr.length < 0) throw new Error('badany obiekt nie jest tablica lub jest pusty');
+  }
+
   static validateNumber(value) {
-    return typeof value === 'number'
+    return typeof value === 'number';
   }
 
   static validateString(value) {
-    return typeof value === 'string'
+    return typeof value === 'string';
   }
 
   static validateObject(value) {
-    return typeof value === 'object'
+    return Object.prototype.toString.call(value) === '[object Object]';
   }
 
-  static stringNormalize(value) {
-    return value.replace(/\s/g, '').toLowerCase();
+  static validateArray(value) {
+    return Array.isArray(value) && value.length > 0;
   }
 }
 
 function filterWith(arr, phrase) {
-  const result = [];
+  Validator.validateData(arr, phrase);
   const copyOfArray = arr;
 
-  if(phrase.length <= 2 && !Validator.validateNumber(phrase)) throw new Error('phrase is too short or is a number')
-  phrase = Validator.stringNormalize(phrase);
+  return copyOfArray.filter(el => {
+    const needle = new RegExp(phrase.toString());
 
-  async function hasNeedle(arr, needle) {
-    const stock = arr
+    if( Validator.validateNumber(el) ) return el.toString().match(needle)
 
-    for (const key in stock) {
-      const stockElement = stock[key]
+    if (Validator.validateString(el) ) return el.match(needle)
 
-      if (Validator.validateString(stockElement)) {
-        const normalizedString = Validator.stringNormalize(stockElement)
+    if (Validator.validateObject(el) ) return filterWith(Object.values(el), phrase).length > 0
 
-        if(normalizedString.includes(needle))  {
-          return true
-        }
-      }
+    if( Validator.validateArray(el) ) return filterWith(el, phrase).length > 0
 
-      if (Validator.validateObject(stockElement)) {
-        await hasNeedle(stockElement, needle)
-      }
-    }
-  }
-
-  for (const key in copyOfArray) {
-    console.log(copyOfArray[key])
-    const element = copyOfArray[key]
-    if(hasNeedle(element, phrase)) result.push(element)
-  }
-
-  console.log(result)
-  return result;
+    return false
+  })
 }
 //jako 1 argument podajemy naszą tablicę obiektów. Jako drugi argument szukaną frazę np:
+
 // console.log(filterWith(data, "Cummings Baxter"));
-// console.log(filterWith(data, "nisi"));
+console.log(filterWith(data, "nisi"));
 // console.log(filterWith(data, "Delacruz Acevedo"));
-//
-filterWith(data, "Cummings Baxter")
+// console.log(filterWith(data, 25))
