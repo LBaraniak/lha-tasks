@@ -1,8 +1,7 @@
 // test
 
 class Switch {
-  cases = [];
-  conditions = [];
+  _conditions = [];
 
   add(condition, callback) {
     if (typeof condition != 'boolean') {
@@ -11,24 +10,24 @@ class Switch {
     if (typeof callback != 'function') {
       throw new Error('Callback must be an function!');
     }
-    this.cases.push(callback);
-    this.conditions.push(condition);
+
+    this._conditions.push({condition,callback});
   }
+  
   isValid() {
     let result = true;
-    for(let i = 0; i < this.conditions.length; i++) {
-      if(this.conditions[i]) {
-        this.cases[i]();
+    for(let i = 0; i < this._conditions.length; i++) {
+      if(this._conditions[i]) {
+        this._conditions[i].callback();
         result = false;
       }
     }
-    this.cases = [];
-    this.conditions = [];
+    this._conditions = [];
     return result;
   }
 
   isEmpty() {
-    if(this.cases.length == 0 && this.conditions.length == 0) return true
+    if(this._conditions.length == 0) return true
     return false;
   }
 }
