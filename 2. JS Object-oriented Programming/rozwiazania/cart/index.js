@@ -112,34 +112,33 @@ class CartItem {
 
 // Singletone
 class DiscountCodes {
-  discountCodesList = [];
+  static instance = null
+  static _discountCodesList = [];
 
-  constructor () {
-    if (!DiscountCodes.instance) {
-      DiscountCodes.instance = this
+  static getInstance() {
+    if (instance === null) {
+      this.instance = new DiscountCodes()
     }
-    // Initialize object
-    return DiscountCodes.instance
+    return this.instance
   }
 
-  addDiscountCode(name, value) {
+  static addDiscountCode(name, value) {
     Validator.isString(name);
     Validator.isNumber(value);
 
-    const code = {name: name, value: value};
-    this.discountCodesList.push(code)
+    const code = { name, value } ;
+    this._discountCodesList.push(code)
   }
 
-  getDiscountCodesValues(name) {
+  static getDiscountCodesValue(name) {
     Validator.isString(name);
 
-    return this.discountCodesList.find(element => {
+    return this._discountCodesList.find(element => {
       return element.name === name;
     })
   }
 }
-const discountCodes = new DiscountCodes()
-Object.freeze(discountCodes)
+
 
 
 class Cart {
@@ -165,8 +164,8 @@ class Cart {
   deleteCartItem(cartItem) {
     Validator.isObject(cartItem);
 
-    const index = this._cartItemsList.findIndex(element => {
-      return element._id === cartItem._id;
+    const index = this._cartItemsList.filter(element => {
+      return element._id !== cartItem._id;
     })
 
     if (index === -1) return
@@ -177,7 +176,7 @@ class Cart {
   addDiscountCode(discountCode) {
     Validator.isString(discountCode);
 
-    const discountValue = discountCodes.getDiscountCodesValues(discountCode);
+    const discountValue = DiscountCodes.getInstance().getDiscountCodesValue(discountCode);
 
     console.log(discountValue)
 
@@ -189,10 +188,7 @@ class Cart {
   }
 
   calculateCart() {
-    const totalAmount = this._cartItemsList.reduce(function (total, currentItem) {
-      total += currentItem.amount;
-      return total
-    } , 0)
+    const totalAmount = this._cartItemsList.reduce((total, currentItem) => (total + currentItem.amount), 0)
 
     if(this.cartDiscount != 0) {
       return totalAmount - ( totalAmount * this.cartDiscount / 100 );
@@ -255,8 +251,8 @@ console.log('Cart: ', cart.getCartItemList())
 
 // 9. dodaje kody rabatowe (2)
 
-discountCodes.addDiscountCode('test', 40)
-discountCodes.addDiscountCode('test2', 50)
+DiscountCodes.addDiscountCode('test', 40)
+DiscountCodes.addDiscountCode('test2', 50)
 
 console.log(discountCodes)
 console.log('Cart: ', cart)
